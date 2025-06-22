@@ -13,7 +13,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://192.168.1.6:5173",
-  "https://your-production-frontend.com"
+  "https://solo-manager-frontend.vercel.app/"
 ];
 
 app.use(cors({

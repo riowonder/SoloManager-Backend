@@ -4,8 +4,7 @@ const userSchema = new mongoose.Schema({
   roll_no: {
     type: String,
     required: true,
-    trim: true,
-    unique: true
+    trim: true
   },
   name: {
     type: String,
@@ -47,5 +46,8 @@ const userSchema = new mongoose.Schema({
     required: true
   }
 }, { timestamps: true, strict: false });
+
+// Compound unique index for roll_no within a gym
+userSchema.index({ gym_id: 1, roll_no: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', userSchema); 

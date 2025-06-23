@@ -90,7 +90,7 @@ exports.addMember = async (req, res) => {
     // Check for duplicate roll_no for this gym
     const existing = await User.findOne({ roll_no, gym_id: adminId });
     if (existing) {
-      return res.status(400).json({ success: false, message: 'Member with this roll number already exists' });
+      return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym' });
     }
     // Create the member with all available fields
     const member = new User({
@@ -110,6 +110,9 @@ exports.addMember = async (req, res) => {
     await member.populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
     return res.status(201).json({ success: true, member });
   } catch (err) {
+    if (err.code === 11000 && err.keyPattern && err.keyPattern.gym_id && err.keyPattern.roll_no) {
+      return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym' });
+    }
     console.error('Add member error:', err);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
@@ -329,9 +332,27 @@ exports.updateMember = async (req, res) => {
   try {
     const updateData = { ...req.body };
     delete updateData.subscriptions;
+    // Check for roll_no uniqueness within the gym if roll_no is being updated
+    if (updateData.roll_no) {
+      const member = await User.findById(req.params.id);
+      if (!member) {
+        return res.status(404).json({ success: false, message: 'Member not found' });
+      }
+      const duplicate = await User.findOne({
+        _id: { $ne: req.params.id },
+        gym_id: member.gym_id,
+        roll_no: updateData.roll_no
+      });
+      if (duplicate) {
+        return res.status(400).json({ success: false, message: 'Another member with this roll number already exists in this gym' });
+      }
+    }
     const member = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
     return res.status(200).json({ success: true, member });
   } catch (err) {
+    if (err.code === 11000 && err.keyPattern && err.keyPattern.gym_id && err.keyPattern.roll_no) {
+      return res.status(400).json({ success: false, message: 'Another member with this roll number already exists in this gym' });
+    }
     console.error('Update member error:', err);
     return res.status(500).json({ success: false, message: 'Server error' });
   }

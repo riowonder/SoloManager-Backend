@@ -26,4 +26,7 @@ router.get("/is-authenticated", authController.isAuthenticated);
 // Login route for manager
 router.post("/manager-login", authController.managerLogin);
 
+// Logout route
+router.post("/logout", authController.logout);
+
 module.exports = router;

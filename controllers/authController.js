@@ -422,3 +422,17 @@ exports.managerLogin = async (req, res) => {
         });
     }
 }
+
+exports.logout = async (req, res) => {
+    try {
+        res.clearCookie("ZM_Cookie", {
+            httpOnly: true,
+            secure: true, // Set manually to true for HTTPS
+            sameSite: "None", // Set manually to None for cross-site
+            path: "/"
+        });
+        return res.status(200).json({ success: true, message: "Logged out successfully" });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: "Logout failed" });
+    }
+}

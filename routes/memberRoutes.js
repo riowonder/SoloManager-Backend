@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router(); 
 const memberController = require('../controllers/memberController');
 const { authenticate, requireManagerOrAdmin } = require('../middleware/auth');
+const upload = require('../middleware/multer');
 
 // Add new member
-router.post('/add', authenticate, requireManagerOrAdmin, memberController.addMember);
+router.post('/add', authenticate, requireManagerOrAdmin, upload.single('image'), memberController.addMember);
 router.get('/get-members', authenticate, requireManagerOrAdmin, memberController.getMembers);
 router.get('/expired', authenticate, requireManagerOrAdmin, memberController.expiredSubscriptions);
 router.post('/expiring-soon', authenticate, requireManagerOrAdmin, memberController.expiringSoon);
@@ -13,7 +14,7 @@ router.post('/expiring-soon', authenticate, requireManagerOrAdmin, memberControl
 router.get('/search', authenticate, requireManagerOrAdmin, memberController.searchMembers);
 
 router.get('/:id', authenticate, requireManagerOrAdmin, memberController.getMemberById);
-router.put('/:id', authenticate, requireManagerOrAdmin, memberController.updateMember);
+router.put('/:id', authenticate, requireManagerOrAdmin, upload.single('image'), memberController.updateMember);
 
 // Subscription routes
 router.post('/:userId/subscription', authenticate, requireManagerOrAdmin, memberController.addSubscription);

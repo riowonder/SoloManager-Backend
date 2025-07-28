@@ -3,6 +3,10 @@ const Admin = require('../models/admin');
 const Subscription = require('../models/subscription');
 const Finance = require('../models/finance');
 const mongoose = require('mongoose');
+const cloudinary = require('../config/cloudinary');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 const PLAN_DURATIONS = {
   '1 Month': 30,
@@ -82,17 +86,36 @@ function getSubscriptionStatus(start_date, end_date) {
 
 exports.addMember = async (req, res) => {
   try {
-    let { roll_no, name, phone_number, height, weight, age, gender, address } = req.body;
+    const { roll_no, name, phone_number, height, weight, age, gender, address } = req.body;
     const adminId = req.user.id;
+
     if (!roll_no || !name) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
-    // Check for duplicate roll_no for this gym
+
+    // Check for duplicate roll_no
     const existing = await User.findOne({ roll_no, gym_id: adminId });
     if (existing) {
       return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym' });
     }
-    // Create the member with all available fields
+
+    // Upload image to Cloudinary (if provided)
+    let imageUrl = '';
+    if (req.file) {
+      // Save buffer to a temporary file
+      const tempPath = path.join(os.tmpdir(), `${Date.now()}-${req.file.originalname}`);
+      fs.writeFileSync(tempPath, req.file.buffer);
+
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(tempPath, {
+        folder: 'gym-members',
+      });
+      imageUrl = result.secure_url;
+
+      // Remove temp file
+      fs.unlinkSync(tempPath);
+    }
+
     const member = new User({
       roll_no,
       name,
@@ -102,15 +125,17 @@ exports.addMember = async (req, res) => {
       age: age ? Number(age) : undefined,
       gender,
       address,
+      image: imageUrl,
       gym_id: adminId,
-      subscriptions: []
+      subscriptions: [],
     });
+
     await member.save();
-    // Populate subscriptions for response (will be empty)
     await member.populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
+
     return res.status(201).json({ success: true, member });
   } catch (err) {
-    if (err.code === 11000 && err.keyPattern && err.keyPattern.gym_id && err.keyPattern.roll_no) {
+    if (err.code === 11000 && err.keyPattern?.gym_id && err.keyPattern?.roll_no) {
       return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym' });
     }
     console.error('Add member error:', err);
@@ -321,7 +346,7 @@ exports.getMemberById = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid member ID' });
     }
     const member = await User.findById(req.params.id).populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
-    return res.status(200).json({ success: true, member });
+    return res.status(200).json({ success: true, member, image: member.image });
   } catch (err) {
     console.error('Get member by id error:', err);
     return res.status(500).json({ success: false, message: 'Server error' });
@@ -332,12 +357,15 @@ exports.updateMember = async (req, res) => {
   try {
     const updateData = { ...req.body };
     delete updateData.subscriptions;
-    // Check for roll_no uniqueness within the gym if roll_no is being updated
+
+    // 1. Fetch the existing member
+    const member = await User.findById(req.params.id);
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Member not found' });
+    }
+
+    // 2. Check for duplicate roll_no if being updated
     if (updateData.roll_no) {
-      const member = await User.findById(req.params.id);
-      if (!member) {
-        return res.status(404).json({ success: false, message: 'Member not found' });
-      }
       const duplicate = await User.findOne({
         _id: { $ne: req.params.id },
         gym_id: member.gym_id,
@@ -347,10 +375,61 @@ exports.updateMember = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Another member with this roll number already exists in this gym' });
       }
     }
-    const member = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
-    return res.status(200).json({ success: true, member });
+
+    // 3. Upload new image if present
+    if (req.file && req.file.buffer) {
+      const uploadResult = await cloudinary.uploader.upload_stream(
+        { folder: 'member_images' },
+        (error, result) => {
+          if (error) throw error;
+          updateData.image = result.secure_url;
+        }
+      );
+
+      // Pipe the buffer to cloudinary stream
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'member_images' },
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary upload error:', error);
+            return res.status(500).json({ success: false, message: 'Image upload failed' });
+          }
+          updateData.image = result.secure_url;
+
+          // Proceed with update after upload
+          proceedWithUpdate();
+        }
+      );
+      stream.end(req.file.buffer);
+      return;
+
+      async function proceedWithUpdate() {
+        const updatedMember = await User.findByIdAndUpdate(
+          req.params.id,
+          updateData,
+          { new: true }
+        ).populate({
+          path: 'subscriptions',
+          options: { sort: { start_date: -1 } }
+        });
+
+        return res.status(200).json({ success: true, member: updatedMember });
+      }
+    } else {
+      // 4. If no image, proceed with update directly
+      const updatedMember = await User.findByIdAndUpdate( 
+        req.params.id,
+        updateData,
+        { new: true }
+      ).populate({
+        path: 'subscriptions',
+        options: { sort: { start_date: -1 } }
+      });
+
+      return res.status(200).json({ success: true, member: updatedMember });
+    }
   } catch (err) {
-    if (err.code === 11000 && err.keyPattern && err.keyPattern.gym_id && err.keyPattern.roll_no) {
+    if (err.code === 11000 && err.keyPattern?.gym_id && err.keyPattern?.roll_no) {
       return res.status(400).json({ success: false, message: 'Another member with this roll number already exists in this gym' });
     }
     console.error('Update member error:', err);

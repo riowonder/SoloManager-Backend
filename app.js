@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 // CORS Configuration
 const corsOptions = {
-  origin : "https://solo-manager-frontend.vercel.app",
+  origin : ["https://solo-manager-frontend.vercel.app", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"]

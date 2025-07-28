@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  image: {
+    type: String,
+    default: '',
+    trim: true
+  },
   age: {
     type: Number,
     trim: true

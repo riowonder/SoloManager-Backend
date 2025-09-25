@@ -1,4 +1,3 @@
-import { createServer } from '@vercel/node';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -16,24 +15,24 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
+// -------------------- Middleware --------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS Configuration
+// -------------------- CORS --------------------
 const corsOptions = {
   origin: [
     "https://solo-manager-frontend.vercel.app",
     "http://localhost:5173"
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
+  methods: ["GET","POST","PUT","DELETE","PATCH","HEAD"],
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"]
+  allowedHeaders: ["Content-Type","Authorization","Access-Control-Allow-Credentials"]
 };
 app.use(cors(corsOptions));
 
-// Routes
+// -------------------- Routes --------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/member', memberRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -45,7 +44,7 @@ app.get('/', (req, res) => {
   res.send('API is running');
 });
 
-// Connect DB before handling requests
+// -------------------- DB Connection --------------------
 let isConnected = false;
 const ensureDBConnected = async () => {
   if (!isConnected) {
@@ -54,9 +53,8 @@ const ensureDBConnected = async () => {
   }
 };
 
-// Export Vercel handler
+// -------------------- Vercel Handler --------------------
 export default async function handler(req, res) {
   await ensureDBConnected();
-  const server = createServer(app);
-  server(req, res);
+  app(req, res); // call Express app directly
 }

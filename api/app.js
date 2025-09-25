@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import connectDB from './config/db.js';
-import './jobs/subscriptionCron.js';
+import connectDB from '../config/db.js';
+import '../jobs/subscriptionCron.js';
 
 dotenv.config();
 
@@ -31,12 +31,12 @@ app.use(cors(corsOptions));
 
 
 // Routes
-import authRoutes from './routes/authRoutes.js';
-import memberRoutes from './routes/memberRoutes.js';
-import dashboardRoutes from './routes/dashboardRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import financeRoutes from './routes/financeRoutes.js';
-import test from './routes/test.js';
+import authRoutes from '../routes/authRoutes.js';
+import memberRoutes from '../routes/memberRoutes.js';
+import dashboardRoutes from '../routes/dashboardRoutes.js';
+import adminRoutes from '../routes/adminRoutes.js';
+import financeRoutes from '../routes/financeRoutes.js';
+import test from '../routes/test.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/member', memberRoutes);

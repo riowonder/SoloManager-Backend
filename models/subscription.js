@@ -10,6 +10,9 @@ const subscriptionSchema = new mongoose.Schema({
   end_date: { type: Date },
   days_left: { type: Number, default: 0 },
   gym_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true, index: true },
+
+  reminderSent: { type: Boolean, default: false },
+  messageSent: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Subscription', subscriptionSchema);

@@ -1,8 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-require('dotenv').config();
-const connectDB = require('./config/db');
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
+import './jobs/subscriptionCron.js';
+
+dotenv.config();
 
 const app = express();
 
@@ -19,14 +22,6 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"]
 };
 
-// const allowedOrigins = [
-//   "http://localhost:5173",
-//   "http://localhost:5174",
-//   "http://192.168.1.6:5173",
-//   "https://solo-manager-frontend.vercel.app/"
-// ];
-
-
 // Apply CORS before routes
 app.use(cors(corsOptions));
 
@@ -34,21 +29,21 @@ app.use(cors(corsOptions));
 // Connect to MongoDB
 // connectDB();
 
+
 // Routes
-const authRoutes = require('./routes/authRoutes');
+import authRoutes from './routes/authRoutes.js';
+import memberRoutes from './routes/memberRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import financeRoutes from './routes/financeRoutes.js';
+import test from './routes/test.js';
+
 app.use('/api/auth', authRoutes);
-
-const memberRoutes = require('./routes/memberRoutes');
 app.use('/api/member', memberRoutes);
-
-const dashboardRoutes = require('./routes/dashboardRoutes');
 app.use('/api/dashboard', dashboardRoutes);
-
-const adminRoutes = require('./routes/adminRoutes');
 app.use('/api/admin', adminRoutes);
-
-const financeRoutes = require('./routes/financeRoutes');
 app.use('/api/finance', financeRoutes);
+app.use('/api/test', test);
 
 app.get('/', (req, res) => {
   res.send('API is running');

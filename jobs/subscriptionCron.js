@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import Subscription from '../models/subscription.js';
 import { sendExpiryMessage, sendReminderMessage } from '../services/whatsappService.js';
 
-cron.schedule("0 58 0 * * *", async () => {
+cron.schedule("0 30 14 * * *", async () => {
   try {
     const now = new Date();
 

@@ -27,7 +27,7 @@
   "crons": [
     {
       "path": "/api/cron/subscriptionCron",
-      "schedule": "56 10 * * *"
+      "schedule": "10 11 * * *"
     }
   ]
 }

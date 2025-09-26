@@ -33,10 +33,11 @@ export default async function handler(req, res) {
                 sub.messageSent = true;
                 await sub.save();
             } catch (err) {
-                console.error(`❌ Error processing expired sub for user ${sub.user?._id || sub.user}:`, err);
+                console.error(`❌ Error processing expired sub for user ${sub.user?._id || "No ID"}:`, err);
             }
         }
 
+        console.log("Expired subs processed", expiredSubs);
         console.log(`✅ Processed ${expiredSubs.length} expired subscriptions`);
 
         // 2️⃣ Handle reminders for subs expiring in 2 days
@@ -59,10 +60,11 @@ export default async function handler(req, res) {
                 sub.reminderSent = true;
                 await sub.save();
             } catch (err) {
-                console.error(`❌ Error sending reminder for user ${sub.user?._id || sub.user}:`, err);
+                console.error(`❌ Error sending reminder for user ${sub.user?._id || "No ID"}:`, err);
             }
         }
 
+        console.log("Reminder subs processed", reminderSubs);
         console.log(`📩 Sent reminders for ${reminderSubs.length} subscriptions expiring in 2 days`);
 
         return res.status(200).json({

@@ -5,7 +5,7 @@ import Subscription from "../../models/subscription.js"; // adjust path as neede
 import { sendExpiryMessage, sendReminderMessage } from "../../services/whatsappService.js";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 

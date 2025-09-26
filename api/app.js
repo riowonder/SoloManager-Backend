@@ -40,7 +40,7 @@ app.use('/admin', adminRoutes);
 app.use('/finance', financeRoutes);
 app.use('/test', test);
 
-app.get('/api/app', (req, res) => {
+app.get('/', (req, res) => {
   res.send('API is running');
 });
 

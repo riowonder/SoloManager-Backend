@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
   roll_no: {
@@ -55,4 +55,5 @@ const userSchema = new mongoose.Schema({
 // Compound unique index for roll_no within a gym
 userSchema.index({ gym_id: 1, roll_no: 1 }, { unique: true });
 
-module.exports = mongoose.model('User', userSchema); 
+const User = mongoose.model('User', userSchema);
+export default User;

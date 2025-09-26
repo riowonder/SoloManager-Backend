@@ -1,7 +1,7 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
+import { sendExpiryMessage } from '../services/whatsappService.js';
 
-const {sendExpiryMessage} = require('../services/whatsappService');
+const router = express.Router();
 router.get('/send-test-message', sendExpiryMessage);
 
-module.exports = router; 
+export default router;

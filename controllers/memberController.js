@@ -1,12 +1,14 @@
-const User = require('../models/user');
-const Admin = require('../models/admin');
-const Subscription = require('../models/subscription');
-const Finance = require('../models/finance');
-const mongoose = require('mongoose');
-const cloudinary = require('../config/cloudinary');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+import User from '../models/user.js';
+import Admin from '../models/admin.js';
+import Subscription from '../models/subscription.js';
+import Finance from '../models/finance.js';
+import mongoose from 'mongoose';
+import cloudinary from '../config/cloudinary.js';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+
+// ...existing code...
 
 const PLAN_DURATIONS = {
   '1 Month': 30,
@@ -84,7 +86,7 @@ function getSubscriptionStatus(start_date, end_date) {
   return 'Active';
 }
 
-exports.addMember = async (req, res) => {
+export const addMember = async (req, res) => {
   try {
     const { roll_no, name, phone_number, height, weight, age, gender, address } = req.body;
     const adminId = req.user.id;
@@ -143,7 +145,7 @@ exports.addMember = async (req, res) => {
   }
 };
 
-exports.getMembers = async (req, res) => {
+export const getMembers = async (req, res) => {
   try {
     const { filter = 'all' } = req.query; // Add filter parameter
     const gymId = req.user.gym_id; // Use authenticated user's gym_id
@@ -282,7 +284,7 @@ exports.getMembers = async (req, res) => {
   }
 };
 
-exports.expiredSubscriptions = async (req, res) => {
+export const expiredSubscriptions = async (req, res) => {
   try {
     // Use authenticated user's gym_id (works for both admin and manager)
     const gymId = req.user.gym_id;
@@ -309,7 +311,7 @@ exports.expiredSubscriptions = async (req, res) => {
   }
 };
 
-exports.expiringSoon = async (req, res) => {
+export const expiringSoon = async (req, res) => {
   try {
     // Use authenticated user's gym_id (works for both admin and manager)
     const gymId = req.user.gym_id;
@@ -340,7 +342,7 @@ exports.expiringSoon = async (req, res) => {
   }
 };
 
-exports.getMemberById = async (req, res) => {
+export const getMemberById = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid member ID' });
@@ -353,7 +355,7 @@ exports.getMemberById = async (req, res) => {
   }
 };
 
-exports.updateMember = async (req, res) => {
+export const updateMember = async (req, res) => {
   try {
     const updateData = { ...req.body };
     delete updateData.subscriptions;
@@ -437,7 +439,7 @@ exports.updateMember = async (req, res) => {
   }
 };
 
-exports.searchMembers = async (req, res) => {
+export const searchMembers = async (req, res) => {
   try {
     const { q, filter = 'all' } = req.query;
     console.log('Search query:', q, 'Filter:', filter);
@@ -574,7 +576,7 @@ exports.searchMembers = async (req, res) => {
 };
 
 // Add a new subscription for a user
-exports.addSubscription = async (req, res) => {
+export const addSubscription = async (req, res) => {
   try {
     const { userId } = req.params;
     let { plan, amount, extra_days, start_date, end_date, status } = req.body;
@@ -676,7 +678,7 @@ exports.addSubscription = async (req, res) => {
 };
 
 // Get all subscriptions for a user, with filter
-exports.getSubscriptions = async (req, res) => {
+export const getSubscriptions = async (req, res) => {
   try {
     const { userId } = req.params;
     const { filter } = req.query; // all, expired, current, upcoming
@@ -708,7 +710,7 @@ exports.getSubscriptions = async (req, res) => {
 };
 
 // Update a subscription
-exports.updateSubscription = async (req, res) => {
+export const updateSubscription = async (req, res) => {
   try {
     const { subscriptionId } = req.params;
     let { plan, amount, extra_days, start_date } = req.body;
@@ -829,7 +831,7 @@ exports.updateSubscription = async (req, res) => {
 };
 
 // Delete a subscription
-exports.deleteSubscription = async (req, res) => {
+export const deleteSubscription = async (req, res) => {
   try {
     const { subscriptionId } = req.params;
 

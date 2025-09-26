@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const financeSchema = new mongoose.Schema({
   admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true, index: true },
@@ -11,4 +11,5 @@ const financeSchema = new mongoose.Schema({
   category: { type: String },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Finance', financeSchema);
+const Finance = mongoose.model('Finance', financeSchema);
+export default Finance;

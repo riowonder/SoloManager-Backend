@@ -1,8 +1,10 @@
-const jwt = require('jsonwebtoken');
-const Admin = require('../models/admin');
-const Manager = require('../models/manager');
+import jwt from 'jsonwebtoken';
+import Admin from '../models/admin.js';
+import Manager from '../models/manager.js';
 
-exports.authenticate = async (req, res, next) => {
+// ...existing code...
+
+export const authenticate = async (req, res, next) => {
   try {
     const token = req.cookies.ZM_Cookie;
     if (!token) {
@@ -52,7 +54,7 @@ exports.authenticate = async (req, res, next) => {
 };
 
 // Only allow admins
-exports.requireAdmin = (req, res, next) => {
+export const requireAdmin = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     return next();
   }
@@ -60,7 +62,7 @@ exports.requireAdmin = (req, res, next) => {
 };
 
 // Allow managers and admins
-exports.requireManagerOrAdmin = (req, res, next) => {
+export const requireManagerOrAdmin = (req, res, next) => {
   if (req.user && (req.user.role === 'admin' || req.user.role === 'manager')) {
     return next();
   }
@@ -68,7 +70,7 @@ exports.requireManagerOrAdmin = (req, res, next) => {
 };
 
 // Only allow managers
-exports.requireManager = (req, res, next) => {
+export const requireManager = (req, res, next) => {
   if (req.user && req.user.role === 'manager') {
     return next();
   }
@@ -76,7 +78,7 @@ exports.requireManager = (req, res, next) => {
 };
 
 // Check if user has access to specific gym (for managers)
-exports.requireGymAccess = (req, res, next) => {
+export const requireGymAccess = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     return next(); // Admins have access to their own gym
   }

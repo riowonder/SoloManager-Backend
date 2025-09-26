@@ -1,8 +1,9 @@
-const express = require('express');
-const router = express.Router(); 
-const memberController = require('../controllers/memberController');
-const { authenticate, requireManagerOrAdmin } = require('../middleware/auth');
-const upload = require('../middleware/multer');
+import express from 'express';
+import * as memberController from '../controllers/memberController.js';
+import { authenticate, requireManagerOrAdmin } from '../middleware/auth.js';
+import upload from '../middleware/multer.js';
+
+const router = express.Router();
 
 // Add new member
 router.post('/add', authenticate, requireManagerOrAdmin, upload.single('image'), memberController.addMember);
@@ -22,4 +23,4 @@ router.get('/:userId/subscriptions', authenticate, requireManagerOrAdmin, member
 router.put('/subscription/:subscriptionId', authenticate, requireManagerOrAdmin, memberController.updateSubscription);
 router.delete('/subscription/:subscriptionId', authenticate, requireManagerOrAdmin, memberController.deleteSubscription);
 
-module.exports = router; 
+export default router;

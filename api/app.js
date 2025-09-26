@@ -56,5 +56,16 @@ const ensureDBConnected = async () => {
 // -------------------- Vercel Handler --------------------
 export default async function handler(req, res) {
   await ensureDBConnected();
-  app(req, res); // call Express app directly
+  console.log("🔵 Request received (Vercel handler)");
+  app(req, res); // use Express as a handler
+}
+
+// -------------------- Local Development --------------------
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  ensureDBConnected().then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Local server running at http://localhost:${PORT}`);
+    });
+  });
 }

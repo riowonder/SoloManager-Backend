@@ -1,10 +1,11 @@
-const express = require('express');
+import express from 'express';
+import * as dashboardController from '../controllers/dashboardController.js';
+import { authenticate, requireAdmin } from '../middleware/auth.js';
+
 const router = express.Router();
-const dashboardController = require('../controllers/dashboardController');
-const { authenticate, requireAdmin } = require('../middleware/auth');
 
 // Add new custom field
 router.post('/add-field', authenticate, requireAdmin, dashboardController.addFieldToDocuments);
 // router.post('/update-gym-name', authenticate, requireAdmin, dashboardController.updateGymName);
 
-module.exports = router; 
+export default router;

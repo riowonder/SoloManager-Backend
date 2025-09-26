@@ -1,6 +1,8 @@
-const mongoose = require('mongoose');
-const Admin = require('../models/admin');
-const User = require('../models/user');
+import mongoose from 'mongoose';
+import Admin from '../models/admin.js';
+import User from '../models/user.js';
+
+// ...existing code...
 
 const defaultValues = {
   String: "",
@@ -11,7 +13,7 @@ const defaultValues = {
   Array: [],
 };
 
-exports.addFieldToDocuments = async (req, res) => {
+export const addFieldToDocuments = async (req, res) => {
   const { fieldName, fieldType } = req.body;
 
   if (!fieldName || !defaultValues.hasOwnProperty(fieldType)) {

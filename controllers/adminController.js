@@ -1,9 +1,11 @@
-const Admin = require('../models/admin');
-const Manager = require('../models/manager');
-const bcrypt = require('bcrypt');
-const { sendInvitation } = require('../utils/otp');
+import Admin from '../models/admin.js';
+import Manager from '../models/manager.js';
+import bcrypt from 'bcrypt';
+import { sendInvitation } from '../utils/otp.js';
 
-exports.updateGymName = async (req, res) => {
+// ...existing code...
+
+export const updateGymName = async (req, res) => {
   try {
     const { gym_name } = req.body;
     const adminId = req.user.id;
@@ -58,7 +60,7 @@ exports.updateGymName = async (req, res) => {
 }; 
 
 
-exports.inviteManager = async (req, res) => {
+export const inviteManager = async (req, res) => {
   try {
     const { name, email, password, admin_email } = req.body;
 

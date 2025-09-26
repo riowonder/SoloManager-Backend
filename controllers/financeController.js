@@ -1,5 +1,7 @@
-const Finance = require('../models/finance');
-const Admin = require('../models/admin');
+import Finance from '../models/finance.js';
+import Admin from '../models/admin.js';
+
+// ...existing code...
 
 // Helper function to get date range based on period
 function getDateRange(period) {
@@ -40,7 +42,7 @@ function getDateRange(period) {
 }
 
 // Get finance data with period filter
-exports.getFinanceData = async (req, res) => {
+export const getFinanceData = async (req, res) => {
   try {
     const { period = 'current_month' } = req.query;
     const gymId = req.user.gym_id; // Use authenticated user's gym_id
@@ -128,7 +130,7 @@ exports.getFinanceData = async (req, res) => {
 };
 
 // Get all available periods summary
-exports.getFinanceSummary = async (req, res) => {
+export const getFinanceSummary = async (req, res) => {
   try {
     const gymId = req.user.gym_id; // Use authenticated user's gym_id
 

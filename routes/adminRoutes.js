@@ -1,12 +1,13 @@
-const express = require('express');
+import express from 'express';
+import {updateGymName, inviteManager} from '../controllers/adminController.js';
+import { authenticate, requireAdmin } from '../middleware/auth.js';
+
 const router = express.Router();
-const adminController = require('../controllers/adminController');
-const { authenticate, requireAdmin } = require('../middleware/auth');
 
 // Update gym name (Admin only)
-router.put('/update-gym-name', authenticate, requireAdmin, adminController.updateGymName);
+router.put('/update-gym-name', authenticate, requireAdmin, updateGymName);
 
 // Invite manager (Admin only)
-router.post('/invite-manager', authenticate, requireAdmin, adminController.inviteManager);
+router.post('/invite-manager', authenticate, requireAdmin, inviteManager);
 
-module.exports = router; 
+export default router;

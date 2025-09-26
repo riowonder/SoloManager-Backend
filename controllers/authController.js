@@ -1,13 +1,15 @@
-const Admin = require("../models/admin");
-const redis = require("../config/redisClient");
-const bcrypt = require("bcrypt");
-const { generateTokenAndSetCookie } = require("../utils/token");
-const { verifyOTP, sendResetPasswordMail, sendmail } = require("../utils/otp");
-const jwt = require("jsonwebtoken");
-const Manager = require("../models/manager");
+import Admin from "../models/admin.js";
+import redis from "../config/redisClient.js";
+import bcrypt from "bcrypt";
+import { generateTokenAndSetCookie } from "../utils/token.js";
+import { verifyOTP, sendResetPasswordMail, sendmail } from "../utils/otp.js";
+import jwt from "jsonwebtoken";
+import Manager from "../models/manager.js";
+
+// ...existing code...
 
 // Login controller
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { data, password } = req.body;
 
@@ -61,7 +63,7 @@ exports.login = async (req, res) => {
 };
 
 
-exports.signup = async (req, res) => {
+export const signup = async (req, res) => {
     try {
         const { name, gym_name, email, password } = req.body;
 
@@ -126,7 +128,7 @@ exports.signup = async (req, res) => {
 }
 
 
-exports.otpVerification = async (req, res) => {
+export const otpVerification = async (req, res) => {
     try {
         const { inputOtp, email } = req.body;
 
@@ -198,7 +200,7 @@ exports.otpVerification = async (req, res) => {
 }
 
 
-exports.changePassword = async (req, res) => {
+export const changePassword = async (req, res) => {
     try {
         const { email, newPassword } = req.body;
 
@@ -243,7 +245,7 @@ exports.changePassword = async (req, res) => {
 }
 
 
-exports.resetPswdOTP = async (req, res) => {
+export const resetPswdOTP = async (req, res) => {
     try {
         const { otp, email } = req.body;
 
@@ -283,7 +285,7 @@ exports.resetPswdOTP = async (req, res) => {
 }
 
 
-exports.resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
     try {
         const { email } = req.body;
 
@@ -317,7 +319,7 @@ exports.resetPassword = async (req, res) => {
     }
 }
 
-exports.isAuthenticated = async (req, res) => {
+export const isAuthenticated = async (req, res) => {
     try {
         const token = req.cookies.ZM_Cookie;
         if (!token) {
@@ -375,7 +377,7 @@ exports.isAuthenticated = async (req, res) => {
 }
 
 
-exports.managerLogin = async (req, res) => {
+export const managerLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -423,7 +425,7 @@ exports.managerLogin = async (req, res) => {
     }
 }
 
-exports.logout = async (req, res) => {
+export const logout = async (req, res) => {
     try {
         res.clearCookie("ZM_Cookie", {
             httpOnly: true,

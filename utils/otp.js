@@ -1,8 +1,8 @@
-const nodemailer = require("nodemailer");
-const otpGenerator = require("otp-generator");
-const User = require("../models/user");
-const redis = require("../config/redisClient");
-require('dotenv').config();
+import nodemailer from "nodemailer";
+import otpGenerator from "otp-generator";
+import User from "../models/user.js";
+import redis from "../config/redisClient.js";
+import "dotenv/config";
 
 // Generate a 4-digit numeric OTP
 const generateOTP = () => {
@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Function to send OTP via email
-exports.sendmail = async (email) => {
+export const sendmail = async (email) => {
     try {
         // Check if OTP was recently requested (Rate Limiting)
         const otpRequestedRecently = await redis.get(`user:${email}:otp_requested`);
@@ -76,7 +76,7 @@ exports.sendmail = async (email) => {
 };
 
 
-exports.sendResetPasswordMail = async (email) => {
+export const sendResetPasswordMail = async (email) => {
     try {
         // Check if OTP was requested recently (rate limiting)
         const otpRequestedRecently = await redis.get(`admin:${email}:otp_requested`);
@@ -129,7 +129,7 @@ exports.sendResetPasswordMail = async (email) => {
 };
 
 
-exports.sendInvitation = async (email, gym_name, admin_name, your_email, your_password, your_username) => {
+export const sendInvitation = async (email, gym_name, admin_name, your_email, your_password, your_username) => {
     try {
         // Check if email is provided
         if (!email || !gym_name || !admin_name || !your_email || !your_password) {
@@ -176,7 +176,7 @@ exports.sendInvitation = async (email, gym_name, admin_name, your_email, your_pa
 
 
 // OTP Verification
-exports.verifyOTP = async (OTP, inputOTP) => {
+export const verifyOTP = async (OTP, inputOTP) => {
     try {
         if (!OTP || !inputOTP) return false;
 

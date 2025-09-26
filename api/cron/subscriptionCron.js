@@ -12,6 +12,8 @@ export default async function handler(req, res) {
   await connectDB();
   const now = new Date();
 
+  console.log("CRON job started")
+
   try {
     // 1️⃣ Handle expired subscriptions
     const expiredSubs = await Subscription.find({

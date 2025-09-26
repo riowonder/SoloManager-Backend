@@ -38,7 +38,7 @@ app.use('/member', memberRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/admin', adminRoutes);
 app.use('/finance', financeRoutes);
-app.use('/test', test);
+app.use('/api/app/test', test);
 
 app.get('/api/app', (req, res) => {
   res.send('API is running');

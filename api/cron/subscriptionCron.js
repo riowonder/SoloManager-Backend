@@ -23,17 +23,21 @@ export default async function handler(req, res) {
                 { messageSent: false },
                 { messageSent: { $exists: false } }
             ]
-        }).populate("user");
+        });
 
 
         for (const sub of expiredSubs) {
             try {
-                await sendExpiryMessage(sub.user, sub.plan, sub.extra_days, sub.end_date, sub.gym_id);
+                if (!sub?.user) {
+                    console.error(`❌ Subscription ${sub._id} has no associated user.`);
+                    continue; // Skip this subscription
+                }
+                await sendExpiryMessage(sub?.user, sub.plan, sub.extra_days, sub.end_date, sub.gym_id);
                 sub.status = "Expired";
                 sub.messageSent = true;
                 await sub.save();
             } catch (err) {
-                console.error(`❌ Error processing expired sub for user ${sub.user?._id || "No ID"}:`);
+                console.error(`❌ Error processing expired sub for user ${sub?.user?._id || "No ID"}:`);
             }
         }
 
@@ -51,16 +55,20 @@ export default async function handler(req, res) {
                 { reminderSent: false },
                 { reminderSent: { $exists: false } }
             ]
-        }).populate("user");
+        });
 
 
         for (const sub of reminderSubs) {
             try {
-                await sendReminderMessage(sub.user, sub.plan, sub.extra_days, sub.end_date, sub.gym_id);
+                if (!sub?.user) {
+                    console.error(`❌ Subscription ${sub._id} has no associated user.`);
+                    continue; // Skip this subscription
+                }
+                await sendReminderMessage(sub?.user, sub.plan, sub.extra_days, sub.end_date, sub.gym_id);
                 sub.reminderSent = true;
                 await sub.save();
             } catch (err) {
-                console.error(`❌ Error sending reminder for user ${sub.user?._id || "No ID"}:`);
+                console.error(`❌ Error sending reminder for user ${sub.user?._id || "No ID"}`);
             }
         }
 

@@ -54,7 +54,7 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
                 }
             })
         });
-
+        console.log("Expiry message sent to user:", userId);
         return response;
     } catch (err) {
         console.error("Error in sendExpiryMessage:", err);

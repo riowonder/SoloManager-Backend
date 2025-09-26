@@ -11,12 +11,12 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
         const userData = await User.findById(userId);
         const userName = userData?.name || "Member";
         const userPh = userData?.phone_number;
-        if(!userPh) {
+        if (!userPh) {
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }
 
         let planName = plan;
-        if(planName === 'Custom') {
+        if (planName === 'Custom') {
             planName = `Custom + ${extra_days} days`;
         }
 
@@ -55,6 +55,14 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
             })
         });
         console.log("Expiry message sent to user:", userId);
+
+        if (response.data.errors) {
+            console.error("WhatsApp API error:", response.data.errors);
+        } else if (!response.data.messages) {
+            console.warn("No messages object in WhatsApp API response:", response.data);
+        } else {
+            console.log("WhatsApp message sent successfully:", response.data.messages);
+        }
         return response;
     } catch (err) {
         console.error("Error in sendExpiryMessage:", err);
@@ -73,12 +81,12 @@ export const sendReminderMessage = async (userId, plan, extra_days, expiryDate, 
         const userData = await User.findById(userId);
         const userName = userData?.name || "Member";
         const userPh = userData?.phone_number;
-        if(!userPh) {
+        if (!userPh) {
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }
 
         let planName = plan;
-        if(planName === 'Custom') {
+        if (planName === 'Custom') {
             planName = `Custom + ${extra_days} days`;
         }
 

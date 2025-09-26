@@ -33,7 +33,7 @@ export default async function handler(req, res) {
                 sub.messageSent = true;
                 await sub.save();
             } catch (err) {
-                console.error(`❌ Error processing expired sub for user ${sub.user?._id || "No ID"}:`, err);
+                console.error(`❌ Error processing expired sub for user ${sub.user?._id || "No ID"}:`);
             }
         }
 
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
                 sub.reminderSent = true;
                 await sub.save();
             } catch (err) {
-                console.error(`❌ Error sending reminder for user ${sub.user?._id || "No ID"}:`, err);
+                console.error(`❌ Error sending reminder for user ${sub.user?._id || "No ID"}:`);
             }
         }
 

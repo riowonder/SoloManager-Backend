@@ -6,11 +6,11 @@ import User from '../models/user.js';
 export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gymId) => {
     try {
         const adminData = await Admin.findById(gymId);
-        const gymName = adminData.gym_name;
+        const gymName = adminData?.gym_name || "Bodylyn Gym";
 
         const userData = await User.findById(userId);
-        const userName = userData.name;
-        const userPh = userData.phone;
+        const userName = userData?.name || "Member";
+        const userPh = userData?.phone;
         if(!userPh) {
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }
@@ -68,11 +68,11 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
 export const sendReminderMessage = async (userId, plan, extra_days, expiryDate, gymId) => {
     try {
         const adminData = await Admin.findById(gymId);
-        const gymName = adminData.gym_name;
+        const gymName = adminData?.gym_name || "Bodylyn Gym";
 
         const userData = await User.findById(userId);
-        const userName = userData.name;
-        const userPh = userData.phone;
+        const userName = userData?.name || "Member";
+        const userPh = userData?.phone;
         if(!userPh) {
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }

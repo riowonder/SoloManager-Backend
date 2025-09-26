@@ -33,12 +33,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // -------------------- Routes --------------------
-app.use('/auth', authRoutes);
-app.use('/member', memberRoutes);
-app.use('/dashboard', dashboardRoutes);
-app.use('/admin', adminRoutes);
-app.use('/finance', financeRoutes);
-app.use('/test', test);
+app.use('/api/auth', authRoutes);
+app.use('/api/member', memberRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/finance', financeRoutes);
+app.use('/api/test', test);
 
 app.get('/', (req, res) => {
   res.send('API is running');

@@ -3,7 +3,6 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import connectDB from '../config/db.js';
-import '../jobs/subscriptionCron.js';
 import authRoutes from '../routes/authRoutes.js';
 import memberRoutes from '../routes/memberRoutes.js';
 import dashboardRoutes from '../routes/dashboardRoutes.js';

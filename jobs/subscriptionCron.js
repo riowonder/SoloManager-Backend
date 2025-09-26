@@ -65,6 +65,8 @@ cron.schedule("0 30 14 * * *", async () => {
       console.error("Stack trace:", err.stack);
     }
   }
+}, {
+  timezone: "Asia/Kolkata"
 });
 
 

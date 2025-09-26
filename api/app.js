@@ -24,6 +24,7 @@ app.use(cookieParser());
 const corsOptions = {
   origin: [
     "https://solo-manager-frontend.vercel.app",
+    "https://solo-manager-frontend.vercel.app/api/app",
     "http://localhost:5173"
   ],
   methods: ["GET","POST","PUT","DELETE","PATCH","HEAD"],

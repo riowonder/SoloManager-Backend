@@ -10,7 +10,7 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
 
         const userData = await User.findById(userId);
         const userName = userData?.name || "Member";
-        const userPh = userData?.phone;
+        const userPh = userData?.phone_number;
         if(!userPh) {
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }
@@ -72,7 +72,7 @@ export const sendReminderMessage = async (userId, plan, extra_days, expiryDate, 
 
         const userData = await User.findById(userId);
         const userName = userData?.name || "Member";
-        const userPh = userData?.phone;
+        const userPh = userData?.phone_number;
         if(!userPh) {
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }

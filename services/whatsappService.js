@@ -15,7 +15,7 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }
 
-        userPh = "91" + userPh; // Ensure country code is included
+        userPh = "+91" + userPh; // Ensure country code is included
 
         let planName = plan;
         if (planName === 'Custom') {
@@ -87,7 +87,7 @@ export const sendReminderMessage = async (userId, plan, extra_days, expiryDate, 
             throw new Error(`User with ID ${userId} does not have a phone number.`);
         }
 
-        userPh = "91" + userPh; // Ensure country code is included
+        userPh = "+91" + userPh; // Ensure country code is included
 
         let planName = plan;
         if (planName === 'Custom') {

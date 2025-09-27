@@ -57,6 +57,7 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
             })
         });
         console.log("Expiry message sent to user:", userId);
+        console.log("Message sent to phone number:", userPh);
 
         if (response.data.errors) {
             console.error("WhatsApp API error:", response.data.errors);
@@ -125,6 +126,8 @@ export const sendReminderMessage = async (userId, plan, extra_days, expiryDate, 
                 }
             })
         });
+        console.log("Reminder message sent to user:", userId);
+        console.log("Message sent to phone number:", userPh);
 
         return response;
     } catch (err) {

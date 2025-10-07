@@ -58,15 +58,9 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
         const apikey = process.env.SMSTOKEN;
         const url = `https://www.fast2sms.com/dev/whatsapp?authorization=${apikey}&message_id=7021&numbers=${userPh}&variables_values=${userName}|${planName}|${gymName}|${expireDate}`
 
-        axios.get(url)
-        .then((response) => {
-            console.log("WhatsApp message sent successfully:", response.data);
-            console.log("Message sent to phone number:", userPh);
-        })
-        .catch((error) => {
-            console.error("Error sending WhatsApp message:", error);
-        });
-
+        const response = await axios.get(url);
+        console.log("WhatsApp message sent successfully!");
+        console.log("Message sent to phone number:", userPh);
         return response;
     } catch (err) {
         console.error("Error in sendExpiryMessage:", err);
@@ -129,15 +123,9 @@ export const sendReminderMessage = async (userId, plan, extra_days, expiryDate, 
         const apikey = process.env.SMSTOKEN;
         const url = `https://www.fast2sms.com/dev/whatsapp?authorization=${apikey}&message_id=7022&numbers=${userPh}&variables_values=${userName}|${planName}|${gymName}|${expiryDate}`
 
-        axios.get(url)
-        .then((response) => {
-            console.log("WhatsApp message sent successfully:", response.data);
-            console.log("Message sent to phone number:", userPh);
-        })
-        .catch((error) => {
-            console.error("Error sending WhatsApp message:", error);
-        });
-
+        const response = await axios.get(url);
+        console.log("WhatsApp message sent successfully!");
+        console.log("Message sent to phone number:", userPh);
         return response;
     } catch (err) {
         console.error("Error in sendReminderMessage:", err);

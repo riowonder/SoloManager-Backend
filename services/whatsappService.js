@@ -56,7 +56,7 @@ export const sendExpiryMessage = async (userId, plan, extra_days, expiryDate, gy
         // });
         
         const apikey = process.env.SMSTOKEN;
-        const url = `https://www.fast2sms.com/dev/whatsapp?authorization=${apikey}&message_id=7021&numbers=${userPh}&variables_values=${userName}|${planName}|${gymName}|${expireDate}`
+        const url = `https://www.fast2sms.com/dev/whatsapp?authorization=${apikey}&message_id=7173&numbers=${userPh}&variables_values=${userName}|${planName}|${gymName}|${expireDate}`
 
         const response = await axios.get(url);
         console.log("WhatsApp message sent successfully!");
@@ -121,7 +121,7 @@ export const sendReminderMessage = async (userId, plan, extra_days, expiryDate, 
         // });
         
         const apikey = process.env.SMSTOKEN;
-        const url = `https://www.fast2sms.com/dev/whatsapp?authorization=${apikey}&message_id=7022&numbers=${userPh}&variables_values=${userName}|${planName}|${gymName}|${expiryDate}`
+        const url = `https://www.fast2sms.com/dev/whatsapp?authorization=${apikey}&message_id=7162&numbers=${userPh}&variables_values=${userName}|${planName}|${gymName}|${expiryDate}`
 
         const response = await axios.get(url);
         console.log("WhatsApp message sent successfully!");

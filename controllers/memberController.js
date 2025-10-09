@@ -27,9 +27,9 @@ function calculateDaysLeft(subscription_plan, extra_days, start_date = null) {
   }
 
   const today = new Date();
-  today.setHours(0,0,0,0);
+  today.setHours(0, 0, 0, 0);
   const start = new Date(start_date);
-  start.setHours(0,0,0,0);
+  start.setHours(0, 0, 0, 0);
 
   if (start > today) {
     return null;
@@ -91,57 +91,75 @@ export const addMember = async (req, res) => {
     const { roll_no, name, phone_number, height, weight, age, gender, address } = req.body;
     const adminId = req.user.id;
 
-    if (!roll_no || !name) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    // Validate required fields
+    if (!roll_no || !name || !phone_number) {
+      return res.status(400).json({ success: false, message: 'Missing required fields: roll_no, name, phone_number are required.' });
+    }
+
+    // Validate phone number (must be 10 digits)
+    if (!/^\d{10}$/.test(phone_number)) {
+      return res.status(400).json({ success: false, message: 'Phone number must be exactly 10 digits.' });
     }
 
     // Check for duplicate roll_no
-    const existing = await User.findOne({ roll_no, gym_id: adminId });
+    let existing;
+    try {
+      existing = await User.findOne({ roll_no, gym_id: adminId });
+    } catch (dbErr) {
+      console.error('Database error during duplicate check:', dbErr);
+      return res.status(500).json({ success: false, message: 'Database error during duplicate check.' });
+    }
     if (existing) {
-      return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym' });
+      return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym.' });
     }
 
     // Upload image to Cloudinary (if provided)
     let imageUrl = '';
     if (req.file) {
-      // Save buffer to a temporary file
-      const tempPath = path.join(os.tmpdir(), `${Date.now()}-${req.file.originalname}`);
-      fs.writeFileSync(tempPath, req.file.buffer);
-
-      // Upload to Cloudinary
-      const result = await cloudinary.uploader.upload(tempPath, {
-        folder: 'gym-members',
-      });
-      imageUrl = result.secure_url;
-
-      // Remove temp file
-      fs.unlinkSync(tempPath);
+      try {
+        const tempPath = path.join(os.tmpdir(), `${Date.now()}-${req.file.originalname}`);
+        fs.writeFileSync(tempPath, req.file.buffer);
+        const result = await cloudinary.uploader.upload(tempPath, {
+          folder: 'gym-members',
+        });
+        imageUrl = result.secure_url;
+        fs.unlinkSync(tempPath);
+      } catch (imgErr) {
+        console.error('Image upload error:', imgErr);
+        return res.status(500).json({ success: false, message: 'Failed to upload image.' });
+      }
     }
 
-    const member = new User({
-      roll_no,
-      name,
-      phone_number,
-      height: height ? Number(height) : undefined,
-      weight: weight ? Number(weight) : undefined,
-      age: age ? Number(age) : undefined,
-      gender,
-      address,
-      image: imageUrl,
-      gym_id: adminId,
-      subscriptions: [],
-    });
-
-    await member.save();
-    await member.populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
+    // Create member
+    let member;
+    try {
+      member = new User({
+        roll_no,
+        name,
+        phone_number,
+        height: height ? Number(height) : undefined,
+        weight: weight ? Number(weight) : undefined,
+        age: age ? Number(age) : undefined,
+        gender,
+        address,
+        image: imageUrl,
+        gym_id: adminId,
+        subscriptions: [],
+      });
+      await member.save();
+      await member.populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
+    } catch (saveErr) {
+      console.error('Error saving member:', saveErr);
+      if (saveErr.code === 11000 && saveErr.keyPattern?.gym_id && saveErr.keyPattern?.roll_no) {
+        return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym.' });
+      }
+      return res.status(500).json({ success: false, message: 'Failed to save member.' });
+    }
 
     return res.status(201).json({ success: true, member });
   } catch (err) {
-    if (err.code === 11000 && err.keyPattern?.gym_id && err.keyPattern?.roll_no) {
-      return res.status(400).json({ success: false, message: 'Member with this roll number already exists in this gym' });
-    }
-    console.error('Add member error:', err);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error('Unexpected error in addMember:', err);
+    return res.status(500).json({ success: false, message: 'Unexpected server error.' });
   }
 };
 
@@ -169,11 +187,11 @@ export const getMembers = async (req, res) => {
         for (const sub of member.subscriptions) {
           if (!sub.start_date || !sub.end_date) continue;
           const today = new Date();
-          today.setHours(0,0,0,0);
+          today.setHours(0, 0, 0, 0);
           const start = new Date(sub.start_date);
-          start.setHours(0,0,0,0);
+          start.setHours(0, 0, 0, 0);
           const end = new Date(sub.end_date);
-          end.setHours(0,0,0,0);
+          end.setHours(0, 0, 0, 0);
           if (sub.status === 'Upcoming' && start <= today) {
             sub.status = 'Active';
             await sub.save();
@@ -288,7 +306,7 @@ export const expiredSubscriptions = async (req, res) => {
   try {
     // Use authenticated user's gym_id (works for both admin and manager)
     const gymId = req.user.gym_id;
-    
+
     // Find all users for this gym
     const members = await User.find({ gym_id: gymId }).populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
     // Filter those whose latest subscription is expired
@@ -296,14 +314,14 @@ export const expiredSubscriptions = async (req, res) => {
       const latestSub = member.subscriptions && member.subscriptions.length > 0 ? member.subscriptions[0] : null;
       return latestSub && latestSub.end_date && new Date(latestSub.end_date) < new Date();
     });
-    
+
     // Sort expired subscriptions by end_date in descending order (newly expired first)
     const sortedExpired = expired.sort((a, b) => {
       const aEndDate = a.subscriptions[0]?.end_date;
       const bEndDate = b.subscriptions[0]?.end_date;
       return new Date(bEndDate) - new Date(aEndDate);
     });
-    
+
     return res.status(200).json({ success: true, expiredSubscriptions: sortedExpired });
   } catch (err) {
     console.error('Get expired subscriptions error:', err);
@@ -315,7 +333,7 @@ export const expiringSoon = async (req, res) => {
   try {
     // Use authenticated user's gym_id (works for both admin and manager)
     const gymId = req.user.gym_id;
-    
+
     const members = await User.find({ gym_id: gymId }).populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
 
     // Calculate days_left for each member and then filter
@@ -331,8 +349,8 @@ export const expiringSoon = async (req, res) => {
         subscription_plan: latestSub.plan
       };
     })
-    .filter(member => member && member.days_left >= 0 && member.days_left <= 10)
-    .sort((a, b) => a.days_left - b.days_left);
+      .filter(member => member && member.days_left >= 0 && member.days_left <= 10)
+      .sort((a, b) => a.days_left - b.days_left);
 
     return res.status(200).json({ success: true, expiringSoon });
 
@@ -419,7 +437,7 @@ export const updateMember = async (req, res) => {
       }
     } else {
       // 4. If no image, proceed with update directly
-      const updatedMember = await User.findByIdAndUpdate( 
+      const updatedMember = await User.findByIdAndUpdate(
         req.params.id,
         updateData,
         { new: true }
@@ -443,12 +461,12 @@ export const searchMembers = async (req, res) => {
   try {
     const { q, filter = 'all' } = req.query;
     console.log('Search query:', q, 'Filter:', filter);
-    
+
     const gymId = req.user.gym_id;
-    
+
     // Build the base query
     let query = { gym_id: gymId };
-    
+
     // Add search conditions if query exists
     if (q && q.trim()) {
       const regex = new RegExp(q, 'i');
@@ -460,21 +478,21 @@ export const searchMembers = async (req, res) => {
         { address: regex }
       ];
     }
-    
+
     // Get members with search and populate subscriptions
     let members = await User.find(query).populate({ path: 'subscriptions', options: { sort: { start_date: -1 } } });
-    
+
     // Update subscription statuses before filtering
     for (const member of members) {
       if (member.subscriptions && member.subscriptions.length > 0) {
         for (const sub of member.subscriptions) {
           if (!sub.start_date || !sub.end_date) continue;
           const today = new Date();
-          today.setHours(0,0,0,0);
+          today.setHours(0, 0, 0, 0);
           const start = new Date(sub.start_date);
-          start.setHours(0,0,0,0);
+          start.setHours(0, 0, 0, 0);
           const end = new Date(sub.end_date);
-          end.setHours(0,0,0,0);
+          end.setHours(0, 0, 0, 0);
           if (sub.status === 'Upcoming' && start <= today) {
             sub.status = 'Active';
             await sub.save();
@@ -485,7 +503,7 @@ export const searchMembers = async (req, res) => {
         }
       }
     }
-    
+
     // Apply status filter
     let filteredMembers = members;
     if (filter === 'active') {
@@ -509,7 +527,7 @@ export const searchMembers = async (req, res) => {
       });
     }
     // For 'all' filter, use all members (no additional filtering)
-    
+
     // Attach active subscription info, plan name, and days left to each member
     const mapped = filteredMembers.map(member => {
       let activeSubscription = null;
@@ -563,8 +581,8 @@ export const searchMembers = async (req, res) => {
         hasUpcoming
       };
     });
-    
-    return res.status(200).json({ 
+
+    return res.status(200).json({
       success: true,
       members: mapped,
       totalMembers: mapped.length
